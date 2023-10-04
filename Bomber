@@ -1,0 +1,67 @@
+
+@echo off
+title Игра-бомбер
+
+rem Инициализация игрового поля
+setlocal EnableDelayedExpansion
+set "width=10"
+set "height=10"
+
+for /L %%y in (1, 1, %height%) do (
+    for /L %%x in (1, 1, %width%) do (
+        set "board[%%x,%%y]=."
+    )
+)
+
+rem Установка игрока и цели
+set /a playerX=%width% / 2
+set /a playerY=%height% / 2
+set "playerChar=O"
+
+set /a targetX=%random% %% %width% + 1
+set /a targetY=%random% %% %height% + 1
+set "targetChar=X"
+
+rem Основной игровой цикл
+:gameLoop
+cls
+
+rem Отрисовка игрового поля
+for /L %%y in (1, 1, %height%) do (
+    for /L %%x in (1, 1, %width%) do (
+        if %%x==%playerX% if %%y==%playerY% (
+            echo|set /p !playerChar!
+        ) else if %%x==%targetX% if %%y==%targetY% (
+            echo|set /p !targetChar!
+        ) else (
+            echo|set /p !board[%%x,%%y]!
+        )
+    )
+    echo.
+)
+
+set /p move=Введите команду (w,a,s,d): 
+
+rem Обработка движения игрока
+if "%move%"=="w" (
+    set /a newPlayerY=%playerY% - 1
+    if %newPlayerY% geq 1 set /a playerY=%newPlayerY%
+) else if "%move%"=="s" (
+    set /a newPlayerY=%playerY% + 1
+    if %newPlayerY% leq %height% set /a playerY=%newPlayerY%
+) else if "%move%"=="a" (
+    set /a newPlayerX=%playerX% - 1
+    if %newPlayerX% geq 1 set /a playerX=%newPlayerX%
+) else if "%move%"=="d" (
+    set /a newPlayerX=%playerX% + 1
+    if %newPlayerX% leq %width% set /a playerX=%newPlayerX%
+)
+
+rem Проверка попадания в цель
+if %playerX%==%targetX% if %playerY%==%targetY% (
+    echo Поздравляем! Вы попали в цель!
+    pause
+    exit
+)
+
+goto gameLoop
